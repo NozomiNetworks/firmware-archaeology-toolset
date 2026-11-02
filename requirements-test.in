@@ -1,0 +1,2 @@
+# Direct dependency for coverage measurement in local and CI test runs.
+coverage

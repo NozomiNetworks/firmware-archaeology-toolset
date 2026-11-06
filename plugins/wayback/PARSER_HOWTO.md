@@ -1,8 +1,8 @@
 # Wayback Parser How-To
 
-This guide is for developers adding a vendor parser to the private external
-plugin repository. The generic Wayback implementation and parser contract stay
-in the public FAT repository.
+This guide is for developers adding a vendor parser to the external plugin
+directory. The generic Wayback implementation and parser contract stay
+in the FAT repository.
 
 External parsers are copied under the configured plugin root:
 
@@ -372,7 +372,7 @@ FAT stores the normalized result under the download log entry as
 
 ## Parser Author Checklist
 
-1. Add `<plugin-dir>/wayback/parsers/<name>.py` in the private plugin repository.
+1. Add `<plugin-dir>/wayback/parsers/<name>.py` in the external plugin directory.
 2. Implement `extract_links(snapshot, page_html, archive)`.
 3. Reuse:
    - `ArchiveClient.unwrap_replay_url(...)`

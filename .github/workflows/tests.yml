@@ -41,7 +41,7 @@ jobs:
           -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Report test coverage
-        run: python -m coverage report --precision=2 --fail-under=80
+        run: python -m coverage report --precision=2 --fail-under=85
 
   integration:
     runs-on: ubuntu-24.04

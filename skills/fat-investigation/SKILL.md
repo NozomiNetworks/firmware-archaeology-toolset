@@ -142,7 +142,7 @@ post-processing, and future searches connected.
 
 When a vendor product page, download page, archive capture, or direct firmware
 URL becomes useful to the investigation, implement or update the corresponding
-vendor parser in the private external plugin repository before relying on it.
+vendor parser in the external plugin directory before relying on it.
 Use the parser's `post_download(...)` hook for vendor-specific unpacking,
 decryption, metadata extraction, or scouting, and use FAT's own scraper or
 Wayback workflow to perform the download. Do not fetch the useful artifact by
@@ -184,7 +184,7 @@ finding to the exact artifact and tool invocation that produced it.
 
 Feed new filenames, constants, tool names, schema markers, and version
 boundaries back into the FAT project as leads and search terms. If analysis
-reveals a reusable parser or post-download action, implement it in the private
+reveals a reusable parser or post-download action, implement it in the
 vendor plugin and rerun the FAT workflow so the result is persisted.
 
 ## Tips and tricks
@@ -233,7 +233,7 @@ projects.
 - `wayback post` re-runs a scout over already downloaded files without
   re-downloading.
 - If a useful vendor page or file has been found outside FAT, stop and
-  normalize it through the private vendor parser and FAT download flow before
+  normalize it through the vendor parser and FAT download flow before
   continuing the investigation.
 
 ## Verify and report

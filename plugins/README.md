@@ -32,8 +32,7 @@ Shared import/discovery helpers live in `fatlib/discovery.py`. They are used by:
 
 The default external plugin directory is `~/.fat/plugins/`. Configure it with
 `plugin_dir` in `~/.fat/config.json`, or override it for one command with
-`--plugin-dir PATH`. The private vendor repository's `install.sh` copies files
-into this directory.
+`--plugin-dir PATH`. 
 
 There are three separate extension contracts in this tree:
 

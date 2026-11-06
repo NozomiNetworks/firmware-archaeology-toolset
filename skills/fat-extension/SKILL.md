@@ -32,7 +32,7 @@ the entry point.
 3. Read one concrete implementation close to the target:
    - `plugins/dockerhub.py` for source plugins
    - `plugins/wayback/parsers/httpbin.py` for the public Wayback parser
-   - the corresponding private repository module for external vendor parsers
+   - One the external plugin directory module for vendor parsers
 4. External plugin files are loaded from `~/.fat/plugins/` by default, or from
    `plugin_dir` in `~/.fat/config.json` / `--plugin-dir PATH`.
 5. If docs and code disagree, follow the code — then fix the doc in the same
@@ -129,8 +129,8 @@ Run the focused tests for the touched area, then the real CLI workflow:
 
 - source plugin: `tests/test_base_plugin.py`, the plugin's test file,
   `tests/integration_surface_plugins.py` for live search and download paths
-- scraper website parser: public loader tests plus the private repository's
-  vendor parser tests
+- scraper website parser: public loader tests plus the external plugin
+  directory's vendor parser tests
 - Wayback parser and scout: `tests/test_wayback_plugin.py`,
   `tests/test_wayback_parser_utils.py`,
   `tests/test_wayback_status_output.py`, `tests/test_wayback_render.py`,

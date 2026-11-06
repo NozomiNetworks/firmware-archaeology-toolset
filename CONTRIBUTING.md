@@ -28,9 +28,9 @@ Start by reading the relevant guide:
 - [FAT extension skill](skills/fat-extension/SKILL.md) for the shared extension
   workflow.
 
-The public repository contains the generic Wayback implementation and the
+This repository contains the generic Wayback implementation and the
 `httpbin` test parser. Real vendor scrapers and Wayback parsers belong in the
-private external plugin repository and must not be added to this tree.
+external plugin directory and must not be added to this tree.
 
 Add or update tests with the implementation. Use the existing result schemas,
 HTTP helpers, state handling, and command validation unless the change is

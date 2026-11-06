@@ -102,5 +102,5 @@ def load_parser(parser_name: str) -> ModuleType:
         available = ", ".join(available_parser_names()) or "-"
         raise SystemExit(
             f"Unknown Wayback parser {parser_name!r}. Available parsers: {available}. "
-            "Install the private vendor plugin repository if this is a vendor parser."
+            "Install the vendor plugin into the external plugin directory if this is a vendor parser"
         ) from exc

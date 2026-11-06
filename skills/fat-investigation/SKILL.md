@@ -46,7 +46,7 @@ will count as met. If the goal is ambiguous, ask instead of guessing.
 - Promote a lead into FAT only when acting on it — as an archive target, a
   scraper target, or search keywords — and mark it with
   `project lead set <id> status acted`.
-- Dead ends are results. Report when a path needs credentials, or a decision
+- Dead ends are results. Report when a path needs credentials, or a decision 
   from the user instead of grinding on.
 
 ## Investigation flow
@@ -208,7 +208,7 @@ Patterns that decide real investigations:
   target sits on before declaring a decryptor inapplicable.
 - **Record resolved cases.** When an investigation turns on one of these
   patterns, note the specifics (vendor, bridge version, tool, key location)
-  in the project report so the next investigation starts warmer.
+  in the project report so the next investigation starts warmer. 
 
 ## The FAT toolbox
 

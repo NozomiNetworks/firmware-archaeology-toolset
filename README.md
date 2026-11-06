@@ -3,9 +3,9 @@
 [![CI](https://github.com/NozomiNetworks/firmware-archaeology-toolset/actions/workflows/tests.yml/badge.svg)](https://github.com/NozomiNetworks/firmware-archaeology-toolset/actions/workflows/tests.yml)
 
 FAT is a stateful, project-oriented tool for artifact hunting: find likely
-firmware images, SDKs, container images, and other downloadable artifacts
-across public sources, triage them, and retrieve them, including archived
-copies from the Wayback Machine.
+firmware images, SDKs, container images, and other downloadable artifacts across
+public sources, triage them, and retrieve them, including archived copies from
+the Wayback Machine.
 
 Discovery and retrieval stay in one place. Projects, keywords, findings,
 selections, and download history persist in a single `.fat.json` state file, so
@@ -13,32 +13,17 @@ you can run one tool at a time and pick up where you left off.
 
 ![FAT command-line help](docs/images/fat.png)
 
-## Start here
+## Getting started
 
-- [Contributing guide](CONTRIBUTING.md)
-- [Plugin author guide](plugins/README.md)
-- [Wayback parser guide](plugins/wayback/PARSER_HOWTO.md)
-- [Plugin API reference](docs/plugin-api/README.md)
-- Agent playbooks: [investigation](skills/fat-investigation/SKILL.md) and [extension guide](skills/fat-extension/SKILL.md)
-
-## Installation
-
-The published CI configuration currently tests Python 3.14.7. Other Python
-3.10+ versions may work but are not covered by the CI matrix. Outbound network
-access is required for live discovery and archive retrieval. The normal FAT
-runtime has no third-party dependencies. JavaScript-heavy scraper or Wayback
-parsers can opt into the separately locked Playwright environment described in
-the plugin guides.
+The normal FAT runtime has no third-party dependencies. JavaScript-heavy scraper
+or Wayback parsers can opt into the Playwright environment described in the
+plugin guides.
 
 ```bash
 git clone https://github.com/NozomiNetworks/firmware-archaeology-toolset.git
 cd firmware-archaeology-toolset
 python3 fat.py --help
 ```
-
-The project is released under the [BSD 3-Clause License](LICENSE).
-
-## Basic workflow
 
 Create a project, set keywords, then run any plugin:
 
@@ -50,55 +35,36 @@ python3 fat.py github select 1,3
 python3 fat.py github download selected
 python3 fat.py report
 ```
-
 Every plugin shares the same command surface: `status`, `options`, `search`,
-`select`, `clear-selection`, `download`, and `set`. Bare plugin invocation
-defaults to `status`. The `wayback` plugin adds `post` (re-run parser post
-hooks) and `clear` (wipe snapshots, selections, history, and downloaded
-files). All commands accept an optional project name prefix:
+`select`, `clear-selection`, `download`, and `set`. 
+
+The `wayback` plugin adds `post` to run the parser post
+hook and `clear` to wipe snapshots, selections, history, and downloaded
+files. 
+
+All commands accept an optional project name prefix to run commands temporarily
+into a specific project, different than the selected one.
 
 ```bash
 python3 fat.py device-research github status
 python3 fat.py device-research report
 ```
 
-Delete a project with `project delete`; without `--delete-downloads`, FAT
-asks whether downloaded artifacts should be removed as well:
-
-```bash
-python3 fat.py project delete device-research
-python3 fat.py project delete device-research --delete-downloads yes
-```
-
-Project names should avoid the command and plugin names `project`, `set`,
-`lead`, `status`, `report`, `dockerhub`, `github`, `gitlab`, `scraper`, and
-`wayback`. These names are reserved by the command router and cannot be used
-reliably with the explicit `<project> <command>` form.
-
-The global `--state-file` option may appear before or after the command:
-
-```bash
-python3 fat.py --state-file /tmp/fat.json project lead list
-python3 fat.py project lead list --state-file /tmp/fat.json
-```
-
-External vendor plugins are loaded from `~/.fat/plugins/` by default. Configure
+This repository contains the generic Wayback engine
+and the `httpbin` test parser. External vendor plugins are 
+loaded from `~/.fat/plugins/` by default. Configure
 another directory in `~/.fat/config.json`:
 
 ```json
 {"plugin_dir": "/opt/fat/plugins"}
 ```
 
-Use `--plugin-dir PATH` for one command or `--config-file PATH` for another
-configuration file. The public repository contains the generic Wayback engine
-and the `httpbin` test parser; vendor scrapers and Wayback parsers are supplied
-by the private plugin repository and installed with its `install.sh` script.
-External plugins are trusted Python code and run with the same filesystem,
-process, and network privileges as FAT.
+Outputs land in `output/report.md` (human-readable report) and
+`output/downloads/` (artifacts).
 
 ## Leads
 
-Record investigation leads (interesting links) in project state so they
+Record investigation leads in project state so they
 survive across runs and agent sessions:
 
 ```bash
@@ -109,14 +75,25 @@ python3 fat.py project lead set 1 status acted
 python3 fat.py project lead rm 2
 ```
 
-`status` is one of `new` (recorded, not examined), `checked` (examined,
-pending), `acted` (used as input to a FAT action), or `dead` (ruled out).
-`source` is one of `portal` (vendor site), `web` (search or dorks), `writeup`
-(blogs, talks, forums), `repo` (GitHub/GitLab), `image` (Docker Hub),
-`archive` (wayback discovery), or `user` (user-provided). Duplicate URLs are
-rejected; leads appear in `output/report.md` via `fat.py report`.
+The `status` field can assume the following values:
 
-## Examples
+- `new`: recorded, not examined
+- `checked`: examined, still pending
+- `acted`: used as input to a FAT action
+- `dead`: ruled out
+
+The `source` field instead is among:
+- `portal` for vendor sites
+- `web` for searches or dorks
+- `writeup` for blogs, talks and forums
+- `repo` for code repositories
+- `image` for container images 
+- `archive` for archived snaphots 
+- `user` for other, user-provided sources
+
+Duplicate URLs are rejected.
+
+## Basic workflows
 
 Search a code forge or registry (same flow for `github`, `gitlab`,
 `dockerhub`):
@@ -130,30 +107,17 @@ python3 fat.py github set cache-ttl 3600
 python3 fat.py github search
 ```
 
-Source searches use a run-local request budget and deduplicate candidates
-before fetching README content. `per-query` controls the provider page size;
-`max-requests` and `max-enrichments` control the total work in that run. Set
-`request-delay` when a service needs pacing, and set `cache-ttl 0` to disable
-the successful-response cache. The defaults are 50 requests, 10 README
-enrichments, no delay, and a 3600-second cache lifetime. These limits apply to
-one plugin search invocation, not the whole investigation. The cache lives at
-`output/.fat-cache/<plugin>`; use `cache-ttl 0` for a fresh run, or remove that
-plugin directory to clear existing entries. Rate limits and request
-diagnostics are recorded in `.fat.json` and `output/report.md`, and stop the
-affected request path without a blind retry or fallback burst. Docker Hub has
-no README enrichment stage, so `max-enrichments` has no effect there.
-Source discovery is paginated within `max-requests`: FAT requests page 1 for
-every keyword first, then follows later pages round-robin until each provider
-search is complete, the request budget is exhausted, or a provider limits the
-run. GitHub reports provider-capped or incomplete responses, GitLab follows
-its `X-Next-Page` header, and Docker Hub follows its returned `next` URL. The
-search diagnostics in `.fat.json` and `output/report.md` identify pages fetched
-and any partial query. A run with some results and an interrupted query is
-reported as `partial`; increase `max-requests` only when the additional
-upstream work is intended. GitLab HTML fallback is identified separately from
-API pagination completion.
+Searches are paginated and budgeted. FAT walks each provider's result pages
+round-robin within a per-run request budget, and reports a clearly marked
+partial result when the budget ends a query early, so that a big search degrades
+gracefully instead of failing. 
 
-Scrape a vendor download site after installing the private scraper repository:
+Transient errors retry with exponential backoff (honoring Retry-After, up to 4
+attempts), hard rate limits stop the affected path cleanly, and every page
+fetched, failure, and partial query is recorded in .fat.json and
+output/report.md.
+
+Scrape a vendor download site after building the vendor parser:
 
 ```bash
 python3 fat.py scraper set parser <external-parser>
@@ -175,23 +139,39 @@ python3 fat.py wayback select 2:1,2:2
 python3 fat.py wayback download selected
 ```
 
-Outputs land in `output/report.md` (human-readable report) and
-`output/downloads/` (artifacts).
+## Extending and contributing
+
+- [Contributing guide](CONTRIBUTING.md)
+- [Plugin author guide](plugins/README.md)
+- [Wayback parser guide](plugins/wayback/PARSER_HOWTO.md)
+- [Plugin API reference](docs/plugin-api/README.md)
+- Agent playbooks: [investigation](skills/fat-investigation/SKILL.md) and [extension guide](skills/fat-extension/SKILL.md)
+
+Drop a top-level plugin module or package into `plugins/`, expose
+`PLUGIN_CLASS`, and implement the expected methods. Plugins are discovered
+automatically at runtime.
+
+Vendor scraper and Wayback parser modules are fetched from the configured
+external plugin directory. See the [plugin author guide](plugins/README.md) for
+the contracts.
 
 ## Testing
 
 The regular suite runs offline. The source-plugin integration checks try the
-live services first and fall back to small API-shaped fixtures when an
-upstream service is unavailable or rate-limited. The Wayback integration suite
-exercises the live archive first and automatically falls back to a recorded local mirror
-(`tests/wayback_mirror.py`) when web.archive.org is unreachable or throttling;
-the backend used per test is printed in the run summary. Force a Wayback
-backend with `FAT_WAYBACK_INTEGRATION_MODE=live|mirror` (default `auto`):
+live services first and fall back to small API-shaped fixtures when an upstream
+service is unavailable or rate-limited. 
+
+The Wayback integration suite exercises the live archive first and automatically
+falls back to a recorded local mirror (`tests/wayback_mirror.py`) when
+web.archive.org is unreachable or throttling; the backend used per test is
+printed in the run summary. Force a Wayback backend with
+
+`FAT_WAYBACK_INTEGRATION_MODE=live|mirror` (default `auto`)
 
 For source-plugin integration checks, use
 `FAT_SURFACE_INTEGRATION_MODE=live|fixture` (default `auto`) to force the live
-service or deterministic fixture backend. To make the complete integration
-run deterministic, select both fixture backends:
+service or deterministic fixture backend. To make the complete integration run
+deterministic, select both fixture backends:
 
 ```bash
 FAT_SURFACE_INTEGRATION_MODE=fixture \
@@ -231,11 +211,6 @@ python3 -m venv .venv
 Use `./scripts/install_dependencies.sh --browser` for browser support only.
 The Chromium version is selected by the pinned Playwright release.
 
-For a generic manual browser check, `https://quotes.toscrape.com/js/` is a
-small JavaScript-rendered page whose quote elements appear after browser
-execution. Live vendor pages are useful for manual validation but are not
-used as TDD fixtures.
-
 Before opening a pull request, run the local quality gate. It regenerates the
 committed API reference with the pinned documentation environment, runs the
 containerized checks, and reports whether the branch is ready:
@@ -247,14 +222,6 @@ containerized checks, and reports whether the branch is ready:
 CI runs the unit, integration, browser integration, and docs jobs on every
 pull request.
 
-## Extending
-
-Drop a top-level plugin module or package into `plugins/`, expose `PLUGIN_CLASS`,
-and implement the expected methods; it is discovered automatically at runtime.
-Vendor scraper and Wayback parser modules belong in the private external plugin
-repository and are copied into the configured plugin directory by its
-`install.sh` script. See the [plugin author guide](plugins/README.md) for the
-contracts.
 
 ## Repository map
 

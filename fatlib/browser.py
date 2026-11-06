@@ -147,3 +147,4 @@ def render_html(
     options = BrowserOptions(mode="required", wait_until=wait_until, wait_for=wait_for, timeout=timeout)
     with BrowserSession(options) as session:
         return session.render(url)
+

@@ -1,0 +1,29 @@
+{#
+Custom pdoc index page for the FAT plugin API reference.
+
+Extends pdoc's default module-list template and fills the otherwise-empty main
+content with docs/plugin-api/templates/landing.md, rendered through pdoc's
+own markdown pipeline.
+#}
+{% extends "default/index.html.jinja2" %}
+
+{% block title %}FAT Plugin API Reference{% endblock %}
+
+{% block content %}
+    <header class="pdoc">
+        {% block logo %}{% endblock %}
+        {% if search %}
+            <input type="search" placeholder="Search API Documentation..." aria-label="search box">
+        {% endif %}
+    </header>
+    <main class="pdoc">
+        <h1 class="fat-logo" aria-label="Firmware Archaeology Toolset">
+            <pre aria-hidden="true">{% include "fat-logo.txt" %}</pre>
+        </h1>
+        {% set landing %}{% include "landing.md" %}{% endset %}
+        {{ landing | trim | to_html | safe }}
+    </main>
+    {% if search %}
+        {% include "search.html.jinja2" %}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+/* Follow the reader's operating-system/browser color preference. */
+:root {
+    --fat-accent: #ff4fd8;
+    --fat-accent-hover: #ff9ae8;
+}
+
+.pdoc {
+    --link: var(--fat-accent);
+    --link-hover: var(--fat-accent-hover);
+}
+
+.pdoc .pdoc-code .gh,
+.pdoc .pdoc-code .gp,
+.pdoc .pdoc-code .nf,
+.pdoc .pdoc-code .nc,
+.pdoc .pdoc-code .nn,
+.pdoc .pdoc-code .fm {
+    color: var(--fat-accent);
+}
+
+.fat-logo {
+    margin: 0 0 2rem;
+    overflow-x: auto;
+}
+
+.fat-logo pre {
+    color: #ff4fd8;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    font-size: clamp(0.35rem, 1vw, 0.85rem);
+    line-height: 1.15;
+    margin: 0;
+    white-space: pre;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --pdoc-background: #111827;
+    }
+
+    .pdoc {
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --link: var(--fat-accent);
+        --link-hover: var(--fat-accent-hover);
+        --code: #1f2937;
+        --active: #665c00;
+
+        --accent: #374151;
+        --accent2: #6b7280;
+
+        --nav-hover: rgba(255, 255, 255, 0.1);
+        --name: #7dd3fc;
+        --def: #86efac;
+        --annotation: #a7f3d0;
+    }
+}

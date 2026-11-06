@@ -1,0 +1,13 @@
+[run]
+branch = true
+source = .
+omit =
+    tests/*
+    output/*
+    # maintainer-only release tooling (private repo, stripped from the export);
+    # covered by its own targeted tests and the live release run, not by the
+    # product coverage gate.
+    scripts/public_export.py
+
+[report]
+show_missing = true

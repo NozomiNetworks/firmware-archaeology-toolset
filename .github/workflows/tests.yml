@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    container:
+      image: python:3.14.7-slim-bookworm@sha256:23c59390fc717bf09f9336908199a0ae75d9c4264bf296123f94ad772fea3b52
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Show Python version
+        run: python --version
+
+      - name: Verify Python version
+        run: >-
+          python -c
+          'import sys; assert sys.version_info[:3] == (3, 14, 7), sys.version'
+
+      - name: Install locked test tooling
+        run: >-
+          python -m pip install
+          --require-hashes
+          --only-binary=:all:
+          --root-user-action=ignore
+          -r requirements-test.txt
+
+      - name: Run test suite
+        run: >-
+          python -m coverage run --branch
+          -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Report test coverage
+        run: python -m coverage report --precision=2 --fail-under=85
+
+  integration:
+    runs-on: ubuntu-24.04
+    container:
+      image: python:3.14.7-slim-bookworm@sha256:23c59390fc717bf09f9336908199a0ae75d9c4264bf296123f94ad772fea3b52
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Verify Python version
+        run: >-
+          python -c
+          'import sys; assert sys.version_info[:3] == (3, 14, 7), sys.version'
+
+      - name: Install locked test tooling
+        run: >-
+          python -m pip install
+          --require-hashes
+          --only-binary=:all:
+          --root-user-action=ignore
+          -r requirements-test.txt
+
+      - name: Run Wayback httpbin integration checks
+        run: >-
+          python -m coverage run --branch
+          -m unittest discover -s tests -p 'integration_*.py' -v
+
+      - name: Report integration coverage
+        run: python -m coverage report -m
+
+  browser-integration:
+    runs-on: ubuntu-24.04
+    container:
+      image: python:3.14.7-slim-bookworm@sha256:23c59390fc717bf09f9336908199a0ae75d9c4264bf296123f94ad772fea3b52
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Verify Python version
+        run: >-
+          python -c
+          'import sys; assert sys.version_info[:3] == (3, 14, 7), sys.version'
+
+      - name: Install locked browser tooling and Chromium
+        run: ./scripts/install_dependencies.sh --browser --system-deps
+
+      - name: Run deterministic browser integration checks
+        run: python -m unittest discover -s tests -p 'browser_integration.py' -v
+
+  docs:
+    runs-on: ubuntu-24.04
+    container:
+      image: python:3.14.7-slim-bookworm@sha256:23c59390fc717bf09f9336908199a0ae75d9c4264bf296123f94ad772fea3b52
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Verify Python version
+        run: >-
+          python -c
+          'import sys; assert sys.version_info[:3] == (3, 14, 7), sys.version'
+
+      - name: Install locked documentation dependencies
+        run: >-
+          python -m pip install
+          --require-hashes
+          --only-binary=:all:
+          --root-user-action=ignore
+          -r requirements-docs.txt
+
+      - name: Build API documentation
+        run: ./scripts/build_plugin_api_docs.sh /tmp/plugin-api
+
+      - name: Verify generated API pages
+        run: |
+          test -s /tmp/plugin-api/index.html
+          grep -q 'Firmware Archaeology Toolset' /tmp/plugin-api/index.html
+          grep -q 'plugins/base.html' /tmp/plugin-api/index.html
+          test -s /tmp/plugin-api/plugins/base.html
+          test -s /tmp/plugin-api/plugins/scraper/base.html
+          test -s /tmp/plugin-api/plugins/wayback/parsers/api.html
+          grep -q 'SurfacePluginBase' /tmp/plugin-api/plugins/base.html
+
+      - name: Verify documented plugin API coverage
+        run: python3 scripts/verify_plugin_api_docs.py /tmp/plugin-api
+
+      - name: Verify committed API pages are current
+        run: diff -ru docs/plugin-api/reference /tmp/plugin-api

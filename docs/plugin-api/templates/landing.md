@@ -25,9 +25,8 @@ Use the search box above to search the reference.
 
 ## Guides
 
-- [Plugin author guide](../../../plugins/README.md)
-- [Wayback parser guide](../../../plugins/wayback/PARSER_HOWTO.md)
-- [Plugin docs landing page](../README.md)
+- [Plugin author guide](https://github.com/NozomiNetworks/firmware-archaeology-toolset/blob/main/plugins/README.md)
+- [Wayback parser guide](https://github.com/NozomiNetworks/firmware-archaeology-toolset/blob/main/plugins/wayback/PARSER_HOWTO.md)
 
 ## Rebuilding this reference
 

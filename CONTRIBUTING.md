@@ -4,6 +4,13 @@ Thank you for contributing to the Firmware Archaeology Toolset (FAT). Keep
 changes focused, preserve the reproducible security checks, and include tests
 and documentation when behavior changes.
 
+## Pull requests
+
+Pull requests are welcome. CI runs on every PR; the same containerized quality
+gate that runs locally must be green before a change is merged. Accepted PRs
+are merged here by the maintainer, and signed release commits periodically
+mark published states of the project.
+
 ## Before you start
 
 FAT has no third-party runtime dependencies. Optional JavaScript rendering uses
